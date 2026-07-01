@@ -1,0 +1,525 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --surface-primary: #ffffff;
+  --surface-inverse: #1a1a1a;
+  --foreground-primary: #1a1a1a;
+  --foreground-secondary: #666666;
+  --foreground-inverse: #ffffff;
+  --border-primary: #1a1a1a;
+  --accent-primary: #0066ff;
+  --hairline: rgba(26, 26, 26, 0.22);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  color: var(--foreground-primary);
+  background: var(--surface-primary);
+  font-family: "Inter", Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a,
+button,
+input,
+select {
+  outline-color: var(--accent-primary);
+  outline-offset: 3px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--surface-primary);
+}
+
+.mono-label {
+  margin: 0;
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+
+/* HeroBento.vue */
+
+.hero {
+  background: var(--surface-inverse);
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(420px, 1fr);
+  min-height: 720px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 88px 72px;
+  gap: 56px;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 132px;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav a {
+  color: #c8c8c8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav .brand {
+  color: var(--foreground-inverse);
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero-message {
+  max-width: 560px;
+}
+
+.hero-message .mono-label {
+  color: #b8b8b8;
+}
+
+.hero-message h1 {
+  margin: var(--space-5) 0 0;
+  color: var(--foreground-inverse);
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.hero-message p:not(.mono-label) {
+  max-width: 500px;
+  margin: var(--space-5) 0 0;
+  color: #d6d6d6;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.primary-action,
+.secondary-action {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  color: var(--foreground-inverse);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primary-action {
+  background: var(--accent-primary);
+}
+
+.secondary-action {
+  border-color: #707070;
+}
+
+.hero-photo {
+  min-height: 608px;
+  margin: 0;
+  overflow: hidden;
+  background: #303030;
+}
+
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.15) contrast(1.05) brightness(0.82);
+}
+
+.proof-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 1440px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--surface-primary);
+}
+
+.proof-cell {
+  display: grid;
+  gap: var(--space-2);
+  min-height: 132px;
+  padding: 28px 36px;
+  border-right: 1px solid var(--border-primary);
+}
+
+.proof-cell:last-child {
+  border-right: 0;
+}
+
+.proof-cell strong {
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 1.875rem;
+  line-height: 1;
+}
+
+.proof-cell span {
+  color: var(--foreground-secondary);
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+@media (max-width: 920px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 32px 28px 48px;
+  }
+
+  .hero-copy {
+    gap: 88px;
+  }
+
+  .hero-photo {
+    min-height: 360px;
+  }
+
+  .proof-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-message h1 {
+    font-size: 2.5rem;
+  }
+
+  .proof-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ServiceBentoGrid.vue */
+
+.services {
+  background: var(--surface-primary);
+}
+
+.services-inner {
+  display: grid;
+  grid-template-columns: 430px minmax(0, 1fr);
+  max-width: 1440px;
+  min-height: 520px;
+  margin: 0 auto;
+  padding: 88px;
+  gap: 56px;
+}
+
+.services-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.services-intro .mono-label {
+  color: var(--foreground-secondary);
+}
+
+.services-intro h2 {
+  max-width: 430px;
+  margin: 0;
+  color: var(--foreground-primary);
+  font-size: clamp(2rem, 3.4vw, 2.625rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+
+.services-intro p:not(.mono-label) {
+  margin: 0;
+  color: var(--foreground-secondary);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.practice-list {
+  border-top: 1px solid var(--border-primary);
+}
+
+.practice-row {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--space-5);
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.practice-row h3 {
+  margin: 0;
+  color: var(--foreground-primary);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.practice-row p {
+  margin: 0;
+  color: var(--foreground-secondary);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 880px) {
+  .services-inner {
+    grid-template-columns: 1fr;
+    padding: 64px 28px;
+  }
+
+  .practice-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}
+
+
+/* ConsultationPanel.vue */
+
+.impact {
+  background: var(--accent-primary);
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: 420px repeat(4, minmax(0, 1fr));
+  max-width: 1440px;
+  min-height: 360px;
+  margin: 0 auto;
+}
+
+.impact-title,
+.impact-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 360px;
+  padding: 56px 48px;
+  border-right: 1px solid var(--border-primary);
+  color: var(--foreground-inverse);
+}
+
+.impact-cell {
+  gap: 28px;
+  padding: 56px 32px;
+}
+
+.impact-title h2 {
+  max-width: 320px;
+  margin: var(--space-5) 0 0;
+  font-size: clamp(2rem, 3.2vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.impact-cell strong {
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  line-height: 1;
+}
+
+.impact-cell span {
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 430px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 64px 88px;
+  gap: 64px;
+  background: var(--surface-inverse);
+  color: var(--foreground-inverse);
+}
+
+.contact-copy h2 {
+  max-width: 720px;
+  margin: 0;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  line-height: 1.12;
+}
+
+.contact-copy ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-copy li {
+  border: 1px solid #707070;
+  padding: var(--space-2) var(--space-3);
+  color: #d6d6d6;
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.contact-form {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.contact-form label {
+  display: grid;
+  gap: var(--space-2);
+  color: #d6d6d6;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.contact-form input,
+.contact-form select {
+  min-height: 44px;
+  border: 1px solid #707070;
+  background: #111111;
+  color: var(--foreground-inverse);
+  padding: 0 var(--space-3);
+}
+
+.radio-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.radio-row label {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid #707070;
+  padding: 0 var(--space-3);
+}
+
+.contact-form button {
+  min-height: 46px;
+  border: 0;
+  background: var(--accent-primary);
+  color: var(--foreground-inverse);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+@media (max-width: 980px) {
+  .impact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .impact-title,
+  .impact-cell {
+    min-height: 240px;
+  }
+
+  .contact {
+    grid-template-columns: 1fr;
+    padding: 56px 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .impact-grid,
+  .radio-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* SiteFooter.vue */
+
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-5);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 88px;
+  border-top: 1px solid #333333;
+  background: var(--surface-inverse);
+  color: var(--foreground-inverse);
+}
+
+.site-footer strong {
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.site-footer address {
+  margin: 0;
+  color: #c8c8c8;
+  font-style: normal;
+  line-height: 1.55;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    flex-direction: column;
+    padding: 28px;
+  }
+
+  .site-footer address {
+    text-align: left;
+  }
+}
+

@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --surface-primary: #ffffff;
+  --surface-inverse: #1a1a1a;
+  --foreground-primary: #1a1a1a;
+  --foreground-secondary: #666666;
+  --foreground-inverse: #ffffff;
+  --border-primary: #1a1a1a;
+  --accent-primary: #0066ff;
+  --hairline: rgba(26, 26, 26, 0.22);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  color: var(--foreground-primary);
+  background: var(--surface-primary);
+  font-family: "Inter", Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a,
+button,
+input,
+select {
+  outline-color: var(--accent-primary);
+  outline-offset: 3px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--surface-primary);
+}
+
+.mono-label {
+  margin: 0;
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
