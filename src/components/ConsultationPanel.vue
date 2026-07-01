@@ -143,8 +143,7 @@ const outputItems = computed(() => [
 .contact {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 430px;
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
   padding: 64px 88px;
   gap: 64px;
   background: var(--surface-inverse);

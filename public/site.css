@@ -382,8 +382,7 @@ img {
 .contact {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 430px;
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
   padding: 64px 88px;
   gap: 64px;
   background: var(--surface-inverse);
@@ -490,8 +489,8 @@ img {
   display: flex;
   justify-content: space-between;
   gap: var(--space-5);
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 28px 88px;
   border-top: 1px solid #333333;
   background: var(--surface-inverse);
@@ -522,4 +521,3 @@ img {
     text-align: left;
   }
 }
-

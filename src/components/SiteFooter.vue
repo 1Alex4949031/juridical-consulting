@@ -14,8 +14,8 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-5);
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 28px 88px;
   border-top: 1px solid #333333;
   background: var(--surface-inverse);
