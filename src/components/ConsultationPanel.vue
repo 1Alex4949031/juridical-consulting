@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import type { LegalService } from '../data/legalServices'
+import { legalIntakeAreas } from '../data/legalIntake'
 
-const props = defineProps<{
+defineProps<{
   services: LegalService[]
 }>()
 
@@ -10,8 +11,14 @@ const request = reactive({
   name: '',
   phone: '',
   email: '',
-  serviceId: props.services[0]?.id ?? '',
-  practiceKey: 'business',
+  legalAreaId: '',
+  directionId: '',
+  situationId: '',
+  goalId: '',
+  customArea: '',
+  customDirection: '',
+  customSituation: '',
+  customGoal: '',
   documents: 'Нет',
   situation: '',
   consent: false,
@@ -19,18 +26,57 @@ const request = reactive({
 
 const documentOptions = ['Есть', 'Нет', 'Нужно подготовить']
 
-const practiceOptions = [
-  { key: 'business', id: 'business', label: 'Бизнес' },
-  { key: 'court', id: 'court', label: 'Суд' },
-  { key: 'labor', id: 'labor', label: 'Трудовое' },
-  { key: 'estate', id: 'estate', label: 'Недвижимость' },
-  { key: 'family', id: 'family', label: 'Семейное' },
-  { key: 'inheritance', id: 'estate', label: 'Наследство' },
-]
+const selectedArea = computed(() => legalIntakeAreas.find((area) => area.id === request.legalAreaId))
+const selectedDirection = computed(() =>
+  selectedArea.value?.directions.find((direction) => direction.id === request.directionId),
+)
+const selectedSituation = computed(() =>
+  selectedDirection.value?.situations.find((situation) => situation.id === request.situationId),
+)
+const selectedGoal = computed(() => selectedSituation.value?.goals.find((goal) => goal.id === request.goalId))
 
-function selectPractice(service: { key: string; id: string }) {
-  request.practiceKey = service.key
-  request.serviceId = service.id
+function selectArea(areaId: string) {
+  if (request.legalAreaId !== areaId) {
+    request.customArea = ''
+  }
+
+  request.legalAreaId = areaId
+  request.directionId = ''
+  request.situationId = ''
+  request.goalId = ''
+  request.customDirection = ''
+  request.customSituation = ''
+  request.customGoal = ''
+}
+
+function selectDirection(directionId: string) {
+  if (request.directionId !== directionId) {
+    request.customDirection = ''
+  }
+
+  request.directionId = directionId
+  request.situationId = ''
+  request.goalId = ''
+  request.customSituation = ''
+  request.customGoal = ''
+}
+
+function selectSituation(situationId: string) {
+  if (request.situationId !== situationId) {
+    request.customSituation = ''
+  }
+
+  request.situationId = situationId
+  request.goalId = ''
+  request.customGoal = ''
+}
+
+function selectGoal(goalId: string) {
+  if (request.goalId !== goalId) {
+    request.customGoal = ''
+  }
+
+  request.goalId = goalId
 }
 </script>
 
@@ -96,7 +142,108 @@ function selectPractice(service: { key: string; id: string }) {
           <p>Укажите контакт, направление и кратко опишите тему запроса.</p>
         </div>
 
-        <div class="field-grid">
+        <fieldset class="segmented-group">
+          <legend>01. Область права</legend>
+          <div class="intake-segments area-segments">
+            <button
+              v-for="area in legalIntakeAreas"
+              :key="area.id"
+              type="button"
+              :class="{ active: request.legalAreaId === area.id }"
+              @click="selectArea(area.id)"
+            >
+              <span>{{ area.title }}</span>
+              <small>{{ area.description }}</small>
+            </button>
+          </div>
+        </fieldset>
+
+        <label v-if="selectedArea?.isOther" class="custom-field">
+          <span>Своя область права</span>
+          <input
+            v-model="request.customArea"
+            type="text"
+            name="customArea"
+            placeholder="Например: миграционный вопрос или медицинский спор"
+          />
+        </label>
+
+        <fieldset v-if="selectedArea" class="segmented-group">
+          <legend>02. Направление</legend>
+          <div class="intake-segments">
+            <button
+              v-for="direction in selectedArea.directions"
+              :key="direction.id"
+              type="button"
+              :class="{ active: request.directionId === direction.id }"
+              @click="selectDirection(direction.id)"
+            >
+              <span>{{ direction.title }}</span>
+            </button>
+          </div>
+        </fieldset>
+
+        <label v-if="selectedDirection?.isOther" class="custom-field">
+          <span>Свое направление</span>
+          <input
+            v-model="request.customDirection"
+            type="text"
+            name="customDirection"
+            placeholder="Опишите направление своими словами"
+          />
+        </label>
+
+        <fieldset v-if="selectedDirection" class="segmented-group">
+          <legend>03. Тип ситуации</legend>
+          <div class="intake-segments">
+            <button
+              v-for="situationItem in selectedDirection.situations"
+              :key="situationItem.id"
+              type="button"
+              :class="{ active: request.situationId === situationItem.id }"
+              @click="selectSituation(situationItem.id)"
+            >
+              <span>{{ situationItem.title }}</span>
+            </button>
+          </div>
+        </fieldset>
+
+        <label v-if="selectedSituation?.isOther" class="custom-field">
+          <span>Своя ситуация</span>
+          <input
+            v-model="request.customSituation"
+            type="text"
+            name="customSituation"
+            placeholder="Кратко назовите ситуацию"
+          />
+        </label>
+
+        <fieldset v-if="selectedSituation" class="segmented-group">
+          <legend>04. Что нужно получить</legend>
+          <div class="intake-segments">
+            <button
+              v-for="goal in selectedSituation.goals"
+              :key="goal.id"
+              type="button"
+              :class="{ active: request.goalId === goal.id }"
+              @click="selectGoal(goal.id)"
+            >
+              <span>{{ goal.title }}</span>
+            </button>
+          </div>
+        </fieldset>
+
+        <label v-if="selectedGoal?.isOther" class="custom-field">
+          <span>Своя задача</span>
+          <input
+            v-model="request.customGoal"
+            type="text"
+            name="customGoal"
+            placeholder="Например: сопровождение переговоров с конкретной стороной"
+          />
+        </label>
+
+        <div v-if="selectedGoal" class="field-grid">
           <label>
             <span>ФИО</span>
             <input v-model="request.name" type="text" name="name" autocomplete="name" placeholder="Анна Смирнова" />
@@ -111,22 +258,7 @@ function selectPractice(service: { key: string; id: string }) {
           </label>
         </div>
 
-        <fieldset class="segmented-group">
-          <legend>Направление / область права</legend>
-          <div class="practice-segments">
-            <button
-              v-for="service in practiceOptions"
-              :key="service.key"
-              type="button"
-              :class="{ active: request.practiceKey === service.key }"
-              @click="selectPractice(service)"
-            >
-              {{ service.label }}
-            </button>
-          </div>
-        </fieldset>
-
-        <fieldset class="segmented-group">
+        <fieldset v-if="selectedGoal" class="segmented-group">
           <legend>Документы</legend>
           <div class="choice-segments">
             <button
@@ -141,7 +273,7 @@ function selectPractice(service: { key: string; id: string }) {
           </div>
         </fieldset>
 
-        <label class="situation-field">
+        <label v-if="selectedGoal" class="situation-field">
           <span>Тема запроса</span>
           <textarea
             v-model="request.situation"
@@ -150,7 +282,7 @@ function selectPractice(service: { key: string; id: string }) {
           ></textarea>
         </label>
 
-        <div class="form-footer">
+        <div v-if="selectedGoal" class="form-footer">
           <label class="consent-field">
             <input v-model="request.consent" type="checkbox" name="consent" />
             <span>Согласен на обработку данных. Консультация конфиденциальна.</span>
@@ -364,6 +496,7 @@ function selectPractice(service: { key: string; id: string }) {
 }
 
 .practice-segments,
+.intake-segments,
 .choice-segments {
   display: grid;
   gap: var(--space-2);
@@ -374,11 +507,20 @@ function selectPractice(service: { key: string; id: string }) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.intake-segments {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.area-segments {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .choice-segments {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .practice-segments button,
+.intake-segments button,
 .choice-segments button {
   min-height: 40px;
   border: 1px solid var(--hairline);
@@ -392,15 +534,36 @@ function selectPractice(service: { key: string; id: string }) {
   text-align: center;
 }
 
+.intake-segments button {
+  display: grid;
+  gap: 6px;
+  min-height: 58px;
+  align-content: center;
+  padding: var(--space-3);
+  text-align: left;
+}
+
+.intake-segments small {
+  color: var(--foreground-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 .practice-segments button.active {
   border-color: var(--surface-inverse);
   background: var(--surface-inverse);
   color: var(--foreground-inverse);
 }
 
+.intake-segments button.active,
 .choice-segments button.active {
   border-color: var(--accent-primary);
   background: var(--accent-primary);
+  color: var(--foreground-inverse);
+}
+
+.intake-segments button.active small {
   color: var(--foreground-inverse);
 }
 
@@ -479,6 +642,8 @@ function selectPractice(service: { key: string; id: string }) {
   .field-grid,
   .choice-grid,
   .practice-segments,
+  .intake-segments,
+  .area-segments,
   .choice-segments,
   .form-footer {
     grid-template-columns: 1fr;
