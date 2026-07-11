@@ -627,7 +627,16 @@ function selectGoal(goalId: string) {
   border: 0;
 }
 
-.segmented-group legend,
+.segmented-group legend {
+  padding: 0;
+  font-family: "Geist Mono", Consolas, monospace;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+
 .contact-form label > span {
   padding: 0;
   font-family: "Geist Mono", Consolas, monospace;
