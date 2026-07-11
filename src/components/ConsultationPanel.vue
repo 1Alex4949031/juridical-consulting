@@ -1,89 +1,14 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
 import type { LegalService } from '../data/legalServices'
 import { legalIntakeAreas } from '../data/legalIntake'
+import { useConsultationForm } from '../composables/useConsultationForm'
 
-const props = defineProps<{
+const { services } = defineProps<{
   services: LegalService[]
 }>()
 
-const request = reactive({
-  mode: 'quick' as 'quick' | 'detail',
-  name: '',
-  phone: '',
-  email: '',
-  quickPracticeId: props.services[0]?.id ?? '',
-  legalAreaId: '',
-  directionId: '',
-  situationId: '',
-  goalId: '',
-  customArea: '',
-  customDirection: '',
-  customSituation: '',
-  customGoal: '',
-  documents: 'Нет',
-  situation: '',
-  consent: false,
-})
-
-const documentOptions = ['Есть', 'Нет', 'Нужно подготовить']
-const quickPracticeOptions = computed(() => [
-  ...props.services.map((service) => ({ id: service.id, title: service.title })),
-  { id: 'other', title: 'Другое' },
-])
-
-const selectedArea = computed(() => legalIntakeAreas.find((area) => area.id === request.legalAreaId))
-const selectedDirection = computed(() =>
-  selectedArea.value?.directions.find((direction) => direction.id === request.directionId),
-)
-const selectedSituation = computed(() =>
-  selectedDirection.value?.situations.find((situation) => situation.id === request.situationId),
-)
-const selectedGoal = computed(() => selectedSituation.value?.goals.find((goal) => goal.id === request.goalId))
-
-function selectArea(areaId: string) {
-  if (request.legalAreaId !== areaId) {
-    request.customArea = ''
-  }
-
-  request.legalAreaId = areaId
-  request.directionId = ''
-  request.situationId = ''
-  request.goalId = ''
-  request.customDirection = ''
-  request.customSituation = ''
-  request.customGoal = ''
-}
-
-function selectDirection(directionId: string) {
-  if (request.directionId !== directionId) {
-    request.customDirection = ''
-  }
-
-  request.directionId = directionId
-  request.situationId = ''
-  request.goalId = ''
-  request.customSituation = ''
-  request.customGoal = ''
-}
-
-function selectSituation(situationId: string) {
-  if (request.situationId !== situationId) {
-    request.customSituation = ''
-  }
-
-  request.situationId = situationId
-  request.goalId = ''
-  request.customGoal = ''
-}
-
-function selectGoal(goalId: string) {
-  if (request.goalId !== goalId) {
-    request.customGoal = ''
-  }
-
-  request.goalId = goalId
-}
+const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDirection, selectedSituation, selectedGoal } =
+  useConsultationForm(services)
 </script>
 
 <template>
@@ -154,7 +79,7 @@ function selectGoal(goalId: string) {
             :class="{ active: request.mode === 'quick' }"
             role="tab"
             :aria-selected="request.mode === 'quick'"
-            @click="request.mode = 'quick'"
+            @click="request.setMode('quick')"
           >
             Быстрая заявка
           </button>
@@ -163,7 +88,7 @@ function selectGoal(goalId: string) {
             :class="{ active: request.mode === 'detail' }"
             role="tab"
             :aria-selected="request.mode === 'detail'"
-            @click="request.mode = 'detail'"
+            @click="request.setMode('detail')"
           >
             Детальная заявка
           </button>
@@ -205,7 +130,7 @@ function selectGoal(goalId: string) {
                 :key="practice.id"
                 type="button"
                 :class="{ active: request.quickPracticeId === practice.id }"
-                @click="request.quickPracticeId = practice.id"
+                @click="request.selectQuickPractice(practice.id)"
               >
                 {{ practice.title }}
               </button>
@@ -264,7 +189,7 @@ function selectGoal(goalId: string) {
               :key="area.id"
               type="button"
               :class="{ active: request.legalAreaId === area.id }"
-              @click="selectArea(area.id)"
+              @click="request.selectArea(area.id)"
             >
               <span>{{ area.title }}</span>
               <small>{{ area.description }}</small>
@@ -290,7 +215,7 @@ function selectGoal(goalId: string) {
               :key="direction.id"
               type="button"
               :class="{ active: request.directionId === direction.id }"
-              @click="selectDirection(direction.id)"
+              @click="request.selectDirection(direction.id)"
             >
               <span>{{ direction.title }}</span>
             </button>
@@ -315,7 +240,7 @@ function selectGoal(goalId: string) {
               :key="situationItem.id"
               type="button"
               :class="{ active: request.situationId === situationItem.id }"
-              @click="selectSituation(situationItem.id)"
+              @click="request.selectSituation(situationItem.id)"
             >
               <span>{{ situationItem.title }}</span>
             </button>
@@ -340,7 +265,7 @@ function selectGoal(goalId: string) {
               :key="goal.id"
               type="button"
               :class="{ active: request.goalId === goal.id }"
-              @click="selectGoal(goal.id)"
+              @click="request.selectGoal(goal.id)"
             >
               <span>{{ goal.title }}</span>
             </button>
