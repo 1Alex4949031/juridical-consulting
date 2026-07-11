@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logoUrl from '../assets/line-law-logo.png'
+import logoUrl from '../assets/logo.svg'
 </script>
 
 <template>
@@ -49,14 +49,14 @@ import logoUrl from '../assets/line-law-logo.png'
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.56);
   border-radius: 50%;
-  background: #ffffff;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.07);
 }
 
 .footer-logo img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .site-footer address {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logoUrl from '../assets/line-law-logo.png'
+import logoUrl from '../assets/logo.svg'
 
 interface StatItem {
   value: string
@@ -116,14 +116,14 @@ defineProps<{
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.62);
   border-radius: 50%;
-  background: #ffffff;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
 }
 
 .brand-logo img {
-  width: 31px;
-  height: 31px;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .hero-message {
