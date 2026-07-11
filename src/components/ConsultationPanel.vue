@@ -3,14 +3,16 @@ import { computed, reactive } from 'vue'
 import type { LegalService } from '../data/legalServices'
 import { legalIntakeAreas } from '../data/legalIntake'
 
-defineProps<{
+const props = defineProps<{
   services: LegalService[]
 }>()
 
 const request = reactive({
+  mode: 'quick' as 'quick' | 'detail',
   name: '',
   phone: '',
   email: '',
+  quickPracticeId: props.services[0]?.id ?? '',
   legalAreaId: '',
   directionId: '',
   situationId: '',
@@ -25,6 +27,10 @@ const request = reactive({
 })
 
 const documentOptions = ['Есть', 'Нет', 'Нужно подготовить']
+const quickPracticeOptions = computed(() => [
+  ...props.services.map((service) => ({ id: service.id, title: service.title })),
+  { id: 'other', title: 'Другое' },
+])
 
 const selectedArea = computed(() => legalIntakeAreas.find((area) => area.id === request.legalAreaId))
 const selectedDirection = computed(() =>
@@ -142,6 +148,114 @@ function selectGoal(goalId: string) {
           <p>Укажите контакт, направление и кратко опишите тему запроса.</p>
         </div>
 
+        <div class="request-mode" role="tablist" aria-label="Тип заявки">
+          <button
+            type="button"
+            :class="{ active: request.mode === 'quick' }"
+            role="tab"
+            :aria-selected="request.mode === 'quick'"
+            @click="request.mode = 'quick'"
+          >
+            Быстрая заявка
+          </button>
+          <button
+            type="button"
+            :class="{ active: request.mode === 'detail' }"
+            role="tab"
+            :aria-selected="request.mode === 'detail'"
+            @click="request.mode = 'detail'"
+          >
+            Детальная заявка
+          </button>
+        </div>
+
+        <template v-if="request.mode === 'quick'">
+          <div class="field-grid">
+            <label>
+              <span>ФИО</span>
+              <input v-model="request.name" type="text" name="quickName" autocomplete="name" placeholder="Анна Смирнова" />
+            </label>
+            <label>
+              <span>Телефон или Telegram</span>
+              <input
+                v-model="request.phone"
+                type="text"
+                name="quickPhone"
+                autocomplete="tel"
+                placeholder="+7 900 000-00-00"
+              />
+            </label>
+            <label>
+              <span>Электронная почта</span>
+              <input
+                v-model="request.email"
+                type="email"
+                name="quickEmail"
+                autocomplete="email"
+                placeholder="hello@example.ru"
+              />
+            </label>
+          </div>
+
+          <fieldset class="segmented-group">
+            <legend>Направление / область права</legend>
+            <div class="quick-segments">
+              <button
+                v-for="practice in quickPracticeOptions"
+                :key="practice.id"
+                type="button"
+                :class="{ active: request.quickPracticeId === practice.id }"
+                @click="request.quickPracticeId = practice.id"
+              >
+                {{ practice.title }}
+              </button>
+            </div>
+          </fieldset>
+
+          <label v-if="request.quickPracticeId === 'other'" class="custom-field">
+            <span>Свое направление</span>
+            <input
+              v-model="request.customDirection"
+              type="text"
+              name="quickCustomDirection"
+              placeholder="Опишите направление своими словами"
+            />
+          </label>
+
+          <fieldset class="segmented-group">
+            <legend>Документы</legend>
+            <div class="choice-segments">
+              <button
+                v-for="option in documentOptions"
+                :key="option"
+                type="button"
+                :class="{ active: request.documents === option }"
+                @click="request.documents = option"
+              >
+                {{ option }}
+              </button>
+            </div>
+          </fieldset>
+
+          <label class="situation-field">
+            <span>Тема запроса</span>
+            <textarea
+              v-model="request.situation"
+              name="quickSituation"
+              placeholder="Например: нужно проверить договор, подготовить претензию или оценить судебную перспективу."
+            ></textarea>
+          </label>
+
+          <div class="form-footer">
+            <label class="consent-field">
+              <input v-model="request.consent" type="checkbox" name="quickConsent" />
+              <span>Согласен на обработку данных. Консультация конфиденциальна.</span>
+            </label>
+            <button type="button">Получить оценку</button>
+          </div>
+        </template>
+
+        <template v-else>
         <fieldset class="segmented-group">
           <legend>01. Область права</legend>
           <div class="intake-segments area-segments">
@@ -289,6 +403,7 @@ function selectGoal(goalId: string) {
           </label>
           <button type="button">Получить оценку</button>
         </div>
+        </template>
       </form>
     </div>
   </section>
@@ -432,10 +547,36 @@ function selectGoal(goalId: string) {
 
 .form-header p {
   max-width: 39rem;
-  margin: var(--space-2) 0 0;
+  margin: var(--space-4) 0 0;
   color: var(--foreground-secondary);
   font-size: 0.9375rem;
   line-height: 1.5;
+}
+
+.request-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--hairline);
+}
+
+.request-mode button {
+  min-height: 44px;
+  border: 0;
+  border-right: 1px solid var(--hairline);
+  background: var(--surface-primary);
+  color: var(--foreground-primary);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.request-mode button:last-child {
+  border-right: 0;
+}
+
+.request-mode button.active {
+  background: var(--surface-inverse);
+  color: var(--foreground-inverse);
 }
 
 .field-grid,
@@ -496,6 +637,7 @@ function selectGoal(goalId: string) {
 }
 
 .practice-segments,
+.quick-segments,
 .intake-segments,
 .choice-segments {
   display: grid;
@@ -505,6 +647,10 @@ function selectGoal(goalId: string) {
 
 .practice-segments {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.quick-segments {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .intake-segments {
@@ -520,6 +666,7 @@ function selectGoal(goalId: string) {
 }
 
 .practice-segments button,
+.quick-segments button,
 .intake-segments button,
 .choice-segments button {
   min-height: 40px;
@@ -532,6 +679,10 @@ function selectGoal(goalId: string) {
   line-height: 1.1;
   padding: 0 var(--space-2);
   text-align: center;
+}
+
+.quick-segments button {
+  min-height: 46px;
 }
 
 .intake-segments button {
@@ -557,6 +708,7 @@ function selectGoal(goalId: string) {
 }
 
 .intake-segments button.active,
+.quick-segments button.active,
 .choice-segments button.active {
   border-color: var(--accent-primary);
   background: var(--accent-primary);
@@ -642,9 +794,11 @@ function selectGoal(goalId: string) {
   .field-grid,
   .choice-grid,
   .practice-segments,
+  .quick-segments,
   .intake-segments,
   .area-segments,
   .choice-segments,
+  .request-mode,
   .form-footer {
     grid-template-columns: 1fr;
   }
