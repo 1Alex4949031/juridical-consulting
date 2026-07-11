@@ -9,15 +9,14 @@ const props = defineProps<{
 const request = reactive({
   name: '',
   phone: '',
+  email: '',
   serviceId: props.services[0]?.id ?? '',
   practiceKey: 'business',
-  urgency: 'Неделя',
   documents: 'Нет',
   situation: '',
   consent: false,
 })
 
-const urgencyOptions = ['Сегодня', 'Неделя', 'Планово']
 const documentOptions = ['Есть', 'Нет', 'Нужно подготовить']
 
 const practiceOptions = [
@@ -94,22 +93,26 @@ function selectPractice(service: { key: string; id: string }) {
       <form class="contact-form" aria-label="Заявка на консультацию">
         <div class="form-header">
           <h3>Данные для первичного разбора</h3>
-          <p>Поля сгруппированы так, как юрист будет разбирать задачу.</p>
+          <p>Укажите контакт, направление и кратко опишите тему запроса.</p>
         </div>
 
         <div class="field-grid">
           <label>
-            <span>Имя</span>
+            <span>ФИО</span>
             <input v-model="request.name" type="text" name="name" autocomplete="name" placeholder="Анна Смирнова" />
           </label>
           <label>
             <span>Телефон или Telegram</span>
             <input v-model="request.phone" type="text" name="phone" autocomplete="tel" placeholder="+7 900 000-00-00" />
           </label>
+          <label>
+            <span>Электронная почта</span>
+            <input v-model="request.email" type="email" name="email" autocomplete="email" placeholder="hello@example.ru" />
+          </label>
         </div>
 
         <fieldset class="segmented-group">
-          <legend>Практика</legend>
+          <legend>Направление / область права</legend>
           <div class="practice-segments">
             <button
               v-for="service in practiceOptions"
@@ -123,44 +126,27 @@ function selectPractice(service: { key: string; id: string }) {
           </div>
         </fieldset>
 
-        <div class="choice-grid">
-          <fieldset class="segmented-group">
-            <legend>Срочность</legend>
-            <div class="choice-segments">
-              <button
-                v-for="option in urgencyOptions"
-                :key="option"
-                type="button"
-                :class="{ active: request.urgency === option }"
-                @click="request.urgency = option"
-              >
-                {{ option === 'Неделя' ? 'На неделе' : option }}
-              </button>
-            </div>
-          </fieldset>
-
-          <fieldset class="segmented-group">
-            <legend>Документы</legend>
-            <div class="choice-segments">
-              <button
-                v-for="option in documentOptions"
-                :key="option"
-                type="button"
-                :class="{ active: request.documents === option }"
-                @click="request.documents = option"
-              >
-                {{ option }}
-              </button>
-            </div>
-          </fieldset>
-        </div>
+        <fieldset class="segmented-group">
+          <legend>Документы</legend>
+          <div class="choice-segments">
+            <button
+              v-for="option in documentOptions"
+              :key="option"
+              type="button"
+              :class="{ active: request.documents === option }"
+              @click="request.documents = option"
+            >
+              {{ option }}
+            </button>
+          </div>
+        </fieldset>
 
         <label class="situation-field">
-          <span>Кратко опишите ситуацию</span>
+          <span>Тема запроса</span>
           <textarea
             v-model="request.situation"
             name="situation"
-            placeholder="Например: контрагент не исполняет договор, нужна претензия и понимание судебной перспективы."
+            placeholder="Например: нужно проверить договор, подготовить претензию или оценить судебную перспективу."
           ></textarea>
         </label>
 
@@ -328,6 +314,10 @@ function selectPractice(service: { key: string; id: string }) {
   min-width: 0;
 }
 
+.field-grid label:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
 .contact-form label {
   display: grid;
   gap: var(--space-2);
@@ -492,6 +482,10 @@ function selectPractice(service: { key: string; id: string }) {
   .choice-segments,
   .form-footer {
     grid-template-columns: 1fr;
+  }
+
+  .field-grid label:nth-child(3) {
+    grid-column: auto;
   }
 
   .contact-context,
