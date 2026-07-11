@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://1Alex4949031.github.io/juridical-consulting/sitemap.xml

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import logoUrl from '../assets/line-law-logo.png'
+
 interface StatItem {
   value: string
   label: string
@@ -14,17 +16,22 @@ defineProps<{
     <div class="hero-inner">
       <div class="hero-copy">
         <nav class="nav" aria-label="Основная навигация">
-          <a class="brand" href="#">Линия Права</a>
+          <a class="brand" href="#" aria-label="Линия Права">
+            <span class="brand-logo" aria-hidden="true">
+              <img :src="logoUrl" alt="" width="36" height="36" />
+            </span>
+            <span>Линия Права</span>
+          </a>
           <a href="#services">Практики</a>
           <a href="#process">Процесс</a>
           <a href="#contact">Контакты</a>
         </nav>
 
         <div class="hero-message">
-          <p class="mono-label">Юридическое сопровождение</p>
+          <p class="mono-label">Юридическая клиника в Новосибирске</p>
           <h1 id="hero-title">Правовая позиция для сделок, споров и частных вопросов</h1>
           <p>
-            Сначала фиксируем факты, риски и экономику решения. Затем готовим документы, ведем переговоры или защищаем позицию в суде.
+            Консультируем бизнес и частных клиентов в Новосибирске: фиксируем факты, риски и экономику решения, затем готовим документы, ведем переговоры или защищаем позицию в суде.
           </p>
           <div class="hero-actions">
             <a class="primary-action" href="#contact">Запросить консультацию</a>
@@ -90,11 +97,33 @@ defineProps<{
 }
 
 .nav .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--foreground-inverse);
   font-family: "Geist Mono", Consolas, monospace;
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+.brand-logo {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+}
+
+.brand-logo img {
+  width: 31px;
+  height: 31px;
+  object-fit: contain;
 }
 
 .hero-message {
