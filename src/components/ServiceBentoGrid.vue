@@ -34,18 +34,19 @@ defineProps<{
 
 .services-inner {
   display: grid;
-  grid-template-columns: 430px minmax(0, 1fr);
+  grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
   max-width: 1440px;
   min-height: 520px;
   margin: 0 auto;
-  padding: 88px;
-  gap: 56px;
+  padding: clamp(56px, 6vw, 88px);
+  gap: clamp(36px, 4vw, 56px);
 }
 
 .services-intro {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  min-width: 0;
 }
 
 .services-intro .mono-label {
@@ -75,8 +76,9 @@ defineProps<{
 
 .practice-row {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: minmax(190px, 260px) minmax(0, 1fr);
   gap: var(--space-5);
+  min-width: 0;
   padding: 22px 0;
   border-bottom: 1px solid var(--border-primary);
 }
@@ -90,16 +92,28 @@ defineProps<{
 }
 
 .practice-row p {
+  min-width: 0;
   margin: 0;
   color: var(--foreground-secondary);
   font-size: 1rem;
   line-height: 1.45;
 }
 
-@media (max-width: 880px) {
+@media (max-width: 1100px) {
   .services-inner {
     grid-template-columns: 1fr;
     padding: 64px 28px;
+    gap: 40px;
+  }
+
+  .practice-row {
+    grid-template-columns: minmax(190px, 260px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .services-inner {
+    padding: 48px 24px;
   }
 
   .practice-row {
