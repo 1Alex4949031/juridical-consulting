@@ -484,6 +484,22 @@ function selectPractice(service: { key: string; id: string }) {
     grid-template-columns: 1fr;
   }
 
+  .impact-title,
+  .impact-cell {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-primary);
+    padding: 32px 24px;
+  }
+
+  .impact-cell:last-child {
+    border-bottom: 0;
+  }
+
+  .impact-cell {
+    gap: var(--space-3);
+  }
+
   .field-grid label:nth-child(3) {
     grid-column: auto;
   }
@@ -503,25 +519,35 @@ function selectPractice(service: { key: string; id: string }) {
   }
 
   .contact-promises {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-    border-top: 0;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid #484848;
     padding-top: 0;
   }
 
   .contact-promises article:nth-child(3) {
-    display: none;
+    display: grid;
   }
 
   .contact-promises article {
-    display: block;
-    border: 1px solid #707070;
-    padding: var(--space-2);
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 2px var(--space-3);
+    border-bottom: 1px solid #484848;
+    padding: 16px 0;
   }
 
-  .contact-promises strong,
+  .contact-promises article:last-child {
+    border-bottom: 0;
+  }
+
+  .contact-promises strong {
+    display: block;
+    grid-row: span 2;
+  }
+
   .contact-promises p {
-    display: none;
+    display: block;
+    font-size: 0.8125rem;
   }
 }
 </style>

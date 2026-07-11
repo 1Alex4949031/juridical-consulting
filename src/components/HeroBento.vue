@@ -215,6 +215,10 @@ defineProps<{
   .proof-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .proof-cell:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border-primary);
+  }
 }
 
 @media (max-width: 560px) {
@@ -224,6 +228,17 @@ defineProps<{
 
   .proof-strip {
     grid-template-columns: 1fr;
+  }
+
+  .proof-cell {
+    min-height: 108px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-primary);
+    padding: 24px;
+  }
+
+  .proof-cell:last-child {
+    border-bottom: 0;
   }
 }
 </style>
