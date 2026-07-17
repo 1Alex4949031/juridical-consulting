@@ -1,25 +1,25 @@
-import { computed, reactive } from 'vue'
-import { legalIntakeAreas } from '../data/legalIntake'
+import { computed, onMounted, reactive } from 'vue'
+import { MockApiService } from '../api/MockApiService'
+import type { ApiService } from '../api/ApiService'
 import type { LegalService } from '../data/legalServices'
 import { FormModel } from '../models/FormModel'
 
-export function useConsultationForm(services: LegalService[]) {
-  const request = reactive(new FormModel(services))
+export function useConsultationForm(services: LegalService[], apiService: ApiService = new MockApiService()) {
+  const request = reactive(new FormModel(services, apiService))
 
   const documentOptions = ['Есть', 'Нет', 'Нужно подготовить']
   const quickPracticeOptions = computed(() => [
     ...services.map((service) => ({ id: service.id, title: service.title })),
     { id: 'other', title: 'Другое' },
   ])
+  const selectedArea = computed(() => request.selectedArea)
+  const selectedDirection = computed(() => request.selectedDirection)
+  const selectedSituation = computed(() => request.selectedSituation)
+  const selectedGoal = computed(() => request.selectedGoal)
 
-  const selectedArea = computed(() => legalIntakeAreas.find((area) => area.id === request.legalAreaId))
-  const selectedDirection = computed(() =>
-    selectedArea.value?.directions.find((direction) => direction.id === request.directionId),
-  )
-  const selectedSituation = computed(() =>
-    selectedDirection.value?.situations.find((situation) => situation.id === request.situationId),
-  )
-  const selectedGoal = computed(() => selectedSituation.value?.goals.find((goal) => goal.id === request.goalId))
+  onMounted(() => {
+    void request.loadAreas()
+  })
 
   return {
     request,

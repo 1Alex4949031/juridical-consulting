@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { LegalService } from '../data/legalServices'
-import { legalIntakeAreas } from '../data/legalIntake'
 import { useConsultationForm } from '../composables/useConsultationForm'
 
 const { services } = defineProps<{
@@ -101,7 +100,7 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
               <input v-model="request.name" type="text" name="quickName" autocomplete="name" placeholder="Анна Смирнова" />
             </label>
             <label>
-              <span>Телефон или Telegram</span>
+              <span>Телефон</span>
               <input
                 v-model="request.phone"
                 type="text"
@@ -181,18 +180,25 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
         </template>
 
         <template v-else>
+        <div v-if="request.intakeError" class="intake-state error-state" role="alert">
+          <span>{{ request.intakeError }}</span>
+          <button type="button" @click="request.reloadCurrentStep()">Повторить</button>
+        </div>
+
         <fieldset class="segmented-group">
           <legend>01. Область права</legend>
+          <p v-if="request.intakeLoadingStep === 'areas'" class="intake-state">Загружаем области права...</p>
           <div class="intake-segments area-segments">
             <button
-              v-for="area in legalIntakeAreas"
+              v-for="area in request.areas"
               :key="area.id"
               type="button"
               :class="{ active: request.legalAreaId === area.id }"
+              :disabled="request.isIntakeLoading"
               @click="request.selectArea(area.id)"
             >
               <span>{{ area.title }}</span>
-              <small>{{ area.description }}</small>
+              <small v-if="area.description">{{ area.description }}</small>
             </button>
           </div>
         </fieldset>
@@ -209,12 +215,14 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
 
         <fieldset v-if="selectedArea" class="segmented-group">
           <legend>02. Направление</legend>
+          <p v-if="request.intakeLoadingStep === 'directions'" class="intake-state">Загружаем направления...</p>
           <div class="intake-segments">
             <button
-              v-for="direction in selectedArea.directions"
+              v-for="direction in request.directions"
               :key="direction.id"
               type="button"
               :class="{ active: request.directionId === direction.id }"
+              :disabled="request.isIntakeLoading"
               @click="request.selectDirection(direction.id)"
             >
               <span>{{ direction.title }}</span>
@@ -234,12 +242,14 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
 
         <fieldset v-if="selectedDirection" class="segmented-group">
           <legend>03. Тип ситуации</legend>
+          <p v-if="request.intakeLoadingStep === 'situations'" class="intake-state">Загружаем ситуации...</p>
           <div class="intake-segments">
             <button
-              v-for="situationItem in selectedDirection.situations"
+              v-for="situationItem in request.situations"
               :key="situationItem.id"
               type="button"
               :class="{ active: request.situationId === situationItem.id }"
+              :disabled="request.isIntakeLoading"
               @click="request.selectSituation(situationItem.id)"
             >
               <span>{{ situationItem.title }}</span>
@@ -259,12 +269,14 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
 
         <fieldset v-if="selectedSituation" class="segmented-group">
           <legend>04. Что нужно получить</legend>
+          <p v-if="request.intakeLoadingStep === 'expectedResults'" class="intake-state">Загружаем ожидаемые результаты...</p>
           <div class="intake-segments">
             <button
-              v-for="goal in selectedSituation.goals"
+              v-for="goal in request.expectedResults"
               :key="goal.id"
               type="button"
               :class="{ active: request.goalId === goal.id }"
+              :disabled="request.isIntakeLoading"
               @click="request.selectGoal(goal.id)"
             >
               <span>{{ goal.title }}</span>
@@ -628,6 +640,33 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
   text-align: left;
 }
 
+.intake-state {
+  margin: 0;
+  color: var(--foreground-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.error-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  border: 1px solid var(--hairline);
+  padding: var(--space-3);
+}
+
+.error-state button {
+  min-height: 34px;
+  border: 1px solid var(--hairline);
+  background: var(--surface-primary);
+  color: var(--foreground-primary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
 .intake-segments small {
   color: var(--foreground-secondary);
   font-size: 0.75rem;
@@ -651,6 +690,14 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
 
 .intake-segments button.active small {
   color: var(--foreground-inverse);
+}
+
+.practice-segments button:disabled,
+.quick-segments button:disabled,
+.intake-segments button:disabled,
+.choice-segments button:disabled {
+  cursor: wait;
+  opacity: 0.62;
 }
 
 .form-footer {
