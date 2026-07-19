@@ -1,4 +1,4 @@
-import type { ApiService, IntakeOption } from '../api/ApiService'
+import type { ApiService, FormRequest, IntakeOption } from '../api/ApiService'
 import type { LegalService } from '../data/legalServices'
 
 export type RequestMode = 'quick' | 'detail'
@@ -41,6 +41,9 @@ export class FormModel {
   expectedResults: IntakeOption[] = []
   intakeLoadingStep: IntakeLoadingStep = null
   intakeError = ''
+  isSubmitting = false
+  submitError = ''
+  submitSuccess = ''
 
   constructor(
     services: LegalService[],
@@ -178,6 +181,32 @@ export class FormModel {
     this.goalId = goalId
   }
 
+  async submit() {
+    if (this.isSubmitting) {
+      return
+    }
+
+    this.submitError = this.validate()
+    this.submitSuccess = ''
+
+    if (this.submitError) {
+      return
+    }
+
+    this.isSubmitting = true
+
+    try {
+      const response = await this.apiService.createForm(this.createFormRequest())
+      this.submitSuccess = `Заявка №${response.id} принята. Мы свяжемся с вами в течение 24 часов.`
+    } catch (error) {
+      this.submitError = error instanceof Error
+        ? error.message
+        : 'Не удалось отправить заявку. Попробуйте еще раз.'
+    } finally {
+      this.isSubmitting = false
+    }
+  }
+
   private resetDirectionBranch() {
     this.directionId = ''
     this.directions = []
@@ -210,6 +239,101 @@ export class FormModel {
     await this.loadIntakeStep('expectedResults', async () => {
       this.expectedResults = withOtherOption(await this.apiService.getExpectedResults(situationId))
     })
+  }
+
+  private validate() {
+    if (!this.name.trim() || !this.phone.trim()) {
+      return 'Укажите ФИО и телефон.'
+    }
+
+    if (!this.situation.trim()) {
+      return 'Кратко опишите тему запроса.'
+    }
+
+    if (this.mode === 'quick') {
+      if (!this.quickPracticeId) {
+        return 'Выберите направление или область права.'
+      }
+
+      if (this.quickPracticeId === otherOption.id && !this.customDirection.trim()) {
+        return 'Укажите свое направление.'
+      }
+    }
+
+    if (this.mode === 'detail') {
+      if (!this.legalAreaId || !this.directionId || !this.situationId || !this.goalId) {
+        return 'Пройдите все шаги детальной заявки.'
+      }
+
+      if (this.legalAreaId === otherOption.id && !this.customArea.trim()) {
+        return 'Укажите свою область права.'
+      }
+
+      if (this.directionId === otherOption.id && !this.customDirection.trim()) {
+        return 'Укажите свое направление.'
+      }
+
+      if (this.situationId === otherOption.id && !this.customSituation.trim()) {
+        return 'Опишите свою ситуацию.'
+      }
+
+      if (this.goalId === otherOption.id && !this.customGoal.trim()) {
+        return 'Укажите ожидаемый результат.'
+      }
+    }
+
+    if (!this.consent) {
+      return 'Подтвердите согласие на обработку персональных данных.'
+    }
+
+    return ''
+  }
+
+  private createFormRequest(): FormRequest {
+    const email = this.email.trim()
+    const payload: Record<string, string> = {
+      mode: this.mode,
+      documents: this.documents,
+      request_topic: this.situation.trim(),
+    }
+
+    if (this.mode === 'quick') {
+      payload.practice_id = this.quickPracticeId
+
+      if (this.customDirection.trim()) {
+        payload.custom_direction = this.customDirection.trim()
+      }
+    } else {
+      payload.area_id = this.legalAreaId
+      payload.direction_id = this.directionId
+      payload.situation_id = this.situationId
+      payload.expected_result_id = this.goalId
+
+      if (this.customArea.trim()) {
+        payload.custom_area = this.customArea.trim()
+      }
+
+      if (this.customDirection.trim()) {
+        payload.custom_direction = this.customDirection.trim()
+      }
+
+      if (this.customSituation.trim()) {
+        payload.custom_situation = this.customSituation.trim()
+      }
+
+      if (this.customGoal.trim()) {
+        payload.custom_expected_result = this.customGoal.trim()
+      }
+    }
+
+    return {
+      client: {
+        full_name: this.name.trim(),
+        phone_number: this.phone.trim(),
+        ...(email ? { email } : {}),
+      },
+      payload,
+    }
   }
 
   private async loadIntakeStep(step: Exclude<IntakeLoadingStep, null>, loader: () => Promise<void>) {

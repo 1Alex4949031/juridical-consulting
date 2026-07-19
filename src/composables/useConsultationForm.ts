@@ -1,10 +1,10 @@
 import { computed, onMounted, reactive } from 'vue'
-import { MockApiService } from '../api/MockApiService'
 import type { ApiService } from '../api/ApiService'
+import { createApiService } from '../api/createApiService'
 import type { LegalService } from '../data/legalServices'
 import { FormModel } from '../models/FormModel'
 
-export function useConsultationForm(services: LegalService[], apiService: ApiService = new MockApiService()) {
+export function useConsultationForm(services: LegalService[], apiService: ApiService = createApiService()) {
   const request = reactive(new FormModel(services, apiService))
 
   const documentOptions = ['Есть', 'Нет', 'Нужно подготовить']

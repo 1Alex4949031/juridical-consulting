@@ -66,7 +66,12 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
         </div>
       </div>
 
-      <form class="contact-form" aria-label="Заявка на консультацию">
+      <form
+        class="contact-form"
+        aria-label="Заявка на консультацию"
+        :aria-busy="request.isSubmitting"
+        @submit.prevent="request.submit()"
+      >
         <div class="form-header">
           <h3>Данные для первичного разбора</h3>
           <p>Укажите контакт, направление и кратко опишите тему запроса.</p>
@@ -175,7 +180,9 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
               <input v-model="request.consent" type="checkbox" name="quickConsent" />
               <span>Согласен на обработку данных. Консультация конфиденциальна.</span>
             </label>
-            <button type="button">Получить оценку</button>
+            <button type="submit" :disabled="request.isSubmitting">
+              {{ request.isSubmitting ? 'Отправляем...' : 'Получить оценку' }}
+            </button>
           </div>
         </template>
 
@@ -338,9 +345,18 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
             <input v-model="request.consent" type="checkbox" name="consent" />
             <span>Согласен на обработку данных. Консультация конфиденциальна.</span>
           </label>
-          <button type="button">Получить оценку</button>
+          <button type="submit" :disabled="request.isSubmitting || request.isIntakeLoading">
+            {{ request.isSubmitting ? 'Отправляем...' : 'Получить оценку' }}
+          </button>
         </div>
         </template>
+
+        <p v-if="request.submitError" class="submission-message submission-error" role="alert">
+          {{ request.submitError }}
+        </p>
+        <p v-else-if="request.submitSuccess" class="submission-message submission-success" role="status">
+          {{ request.submitSuccess }}
+        </p>
       </form>
     </div>
   </section>
@@ -733,6 +749,30 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
   cursor: pointer;
   font-size: 0.8125rem;
   font-weight: 800;
+}
+
+.form-footer > button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.submission-message {
+  margin: 0;
+  border: 1px solid var(--hairline);
+  padding: var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.submission-error {
+  border-color: #b42318;
+  color: #b42318;
+}
+
+.submission-success {
+  border-color: #147d45;
+  color: #116638;
 }
 
 @media (max-width: 980px) {
