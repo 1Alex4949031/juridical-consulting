@@ -1,19 +1,18 @@
 import {
   ApiService,
-  type ClientDetails,
-  type ClientSummary,
   type FormRequest,
   type FormResponse,
   type IntakeOption,
 } from './ApiService'
+import type {
+  ClientDetailsDto,
+  ClientSummaryDto,
+  FormResponseDto,
+  IntakeOptionDto,
+} from './ApiDto'
 
 interface ApiErrorPayload {
   error?: string
-}
-
-interface ApiIntakeOption {
-  id: string | number
-  title: string
 }
 
 export class ApiError extends Error {
@@ -31,11 +30,14 @@ function createQuery(parameters: Record<string, string>) {
   return query ? `?${query}` : ''
 }
 
-function normalizeOptions(options: ApiIntakeOption[]): IntakeOption[] {
-  return options.map(({ id, title }) => ({
-    id: String(id),
-    title,
-  }))
+function normalizeOptions(options: IntakeOptionDto[]): IntakeOption[] {
+  return options.flatMap(({ id, title }) => {
+    if (id === undefined || typeof title !== 'string') {
+      return []
+    }
+
+    return [{ id: String(id), title }]
+  })
 }
 
 export class HttpApiService extends ApiService {
@@ -54,39 +56,45 @@ export class HttpApiService extends ApiService {
   }
 
   async getAreas(): Promise<IntakeOption[]> {
-    return normalizeOptions(await this.request<ApiIntakeOption[]>('/area'))
+    return normalizeOptions(await this.request<IntakeOptionDto[]>('/area'))
   }
 
   async getDirections(areaId: string): Promise<IntakeOption[]> {
-    const options = await this.request<ApiIntakeOption[]>(`/direction${createQuery({ area_id: areaId })}`)
+    const options = await this.request<IntakeOptionDto[]>(`/direction${createQuery({ area_id: areaId })}`)
     return normalizeOptions(options)
   }
 
   async getSituations(directionId: string): Promise<IntakeOption[]> {
-    const options = await this.request<ApiIntakeOption[]>(`/situation${createQuery({ direction_id: directionId })}`)
+    const options = await this.request<IntakeOptionDto[]>(`/situation${createQuery({ direction_id: directionId })}`)
     return normalizeOptions(options)
   }
 
   async getExpectedResults(situationId: string): Promise<IntakeOption[]> {
-    const options = await this.request<ApiIntakeOption[]>(
+    const options = await this.request<IntakeOptionDto[]>(
       `/expected-result${createQuery({ situation_id: situationId })}`,
     )
     return normalizeOptions(options)
   }
 
   async createForm(request: FormRequest): Promise<FormResponse> {
-    return this.request<FormResponse>('/form', {
+    const response = await this.request<FormResponseDto>('/form', {
       method: 'POST',
       body: JSON.stringify(request),
     })
+
+    if (!Number.isInteger(response.id) || Number(response.id) < 1) {
+      throw new ApiError('Сервер вернул некорректный идентификатор заявки.', 500)
+    }
+
+    return { id: response.id as number }
   }
 
-  async getClients(): Promise<ClientSummary[]> {
-    return this.request<ClientSummary[]>('/clients')
+  async getClients(): Promise<ClientSummaryDto[]> {
+    return this.request<ClientSummaryDto[]>('/clients')
   }
 
-  async getClient(id: number): Promise<ClientDetails> {
-    return this.request<ClientDetails>(`/clients/${encodeURIComponent(String(id))}`)
+  async getClient(id: number): Promise<ClientDetailsDto> {
+    return this.request<ClientDetailsDto>(`/clients/${encodeURIComponent(String(id))}`)
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {

@@ -1,5 +1,6 @@
 import type { ApiService, FormRequest, IntakeOption } from '../api/ApiService'
 import type { LegalService } from '../data/legalServices'
+import { getRussianPhoneError, normalizeRussianPhone } from '../domain/phone'
 
 export type RequestMode = 'quick' | 'detail'
 export type IntakeLoadingStep = 'areas' | 'directions' | 'situations' | 'expectedResults' | null
@@ -70,6 +71,10 @@ export class FormModel {
 
   get selectedGoal() {
     return this.expectedResults.find((goal) => goal.id === this.goalId)
+  }
+
+  get phoneError() {
+    return getRussianPhoneError(this.phone)
   }
 
   setMode(mode: RequestMode) {
@@ -242,8 +247,12 @@ export class FormModel {
   }
 
   private validate() {
-    if (!this.name.trim() || !this.phone.trim()) {
-      return 'Укажите ФИО и телефон.'
+    if (!this.name.trim()) {
+      return 'Укажите ФИО.'
+    }
+
+    if (this.phoneError) {
+      return this.phoneError
     }
 
     if (!this.situation.trim()) {
@@ -291,6 +300,12 @@ export class FormModel {
 
   private createFormRequest(): FormRequest {
     const email = this.email.trim()
+    const phone = normalizeRussianPhone(this.phone)
+
+    if (!phone) {
+      throw new Error(getRussianPhoneError(this.phone))
+    }
+
     const payload: Record<string, string> = {
       mode: this.mode,
       documents: this.documents,
@@ -329,7 +344,7 @@ export class FormModel {
     return {
       client: {
         full_name: this.name.trim(),
-        phone_number: this.phone.trim(),
+        phone_number: phone,
         ...(email ? { email } : {}),
       },
       payload,

@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_API_MODE?: 'mock' | 'api'
   readonly VITE_BASE_API_URL?: string
+  readonly VITE_ENABLE_APPLICATIONS_PAGE?: 'true' | 'false'
 }
 
 interface ImportMeta {

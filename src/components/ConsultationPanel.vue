@@ -6,8 +6,27 @@ const { services } = defineProps<{
   services: LegalService[]
 }>()
 
-const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDirection, selectedSituation, selectedGoal } =
-  useConsultationForm(services)
+const {
+  request,
+  documentOptions,
+  quickPracticeOptions,
+  selectedArea,
+  selectedDirection,
+  selectedSituation,
+  selectedGoal,
+  phoneError,
+  touchPhone,
+  updatePhone,
+  submit,
+} = useConsultationForm(services)
+
+function handlePhoneInput(event: Event) {
+  const input = event.currentTarget
+
+  if (input instanceof HTMLInputElement) {
+    updatePhone(input.value)
+  }
+}
 </script>
 
 <template>
@@ -70,7 +89,7 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
         class="contact-form"
         aria-label="Заявка на консультацию"
         :aria-busy="request.isSubmitting"
-        @submit.prevent="request.submit()"
+        @submit.prevent="submit"
       >
         <div class="form-header">
           <h3>Данные для первичного разбора</h3>
@@ -107,12 +126,19 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
             <label>
               <span>Телефон</span>
               <input
-                v-model="request.phone"
-                type="text"
+                :value="request.phone"
+                type="tel"
                 name="quickPhone"
                 autocomplete="tel"
-                placeholder="+7 900 000-00-00"
+                inputmode="tel"
+                maxlength="20"
+                :aria-invalid="Boolean(phoneError)"
+                :aria-describedby="phoneError ? 'phone-error' : undefined"
+                placeholder="+7 900 000 00 00"
+                @input="handlePhoneInput"
+                @blur="touchPhone"
               />
+              <small v-if="phoneError" id="phone-error" class="field-error">{{ phoneError }}</small>
             </label>
             <label>
               <span>Электронная почта</span>
@@ -307,8 +333,21 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
             <input v-model="request.name" type="text" name="name" autocomplete="name" placeholder="Анна Смирнова" />
           </label>
           <label>
-            <span>Телефон или Telegram</span>
-            <input v-model="request.phone" type="text" name="phone" autocomplete="tel" placeholder="+7 900 000-00-00" />
+            <span>Телефон</span>
+            <input
+              :value="request.phone"
+              type="tel"
+              name="phone"
+              autocomplete="tel"
+              inputmode="tel"
+              maxlength="20"
+              :aria-invalid="Boolean(phoneError)"
+              :aria-describedby="phoneError ? 'phone-error' : undefined"
+              placeholder="+7 900 000 00 00"
+              @input="handlePhoneInput"
+              @blur="touchPhone"
+            />
+            <small v-if="phoneError" id="phone-error" class="field-error">{{ phoneError }}</small>
           </label>
           <label>
             <span>Электронная почта</span>
@@ -562,6 +601,13 @@ const { request, documentOptions, quickPracticeOptions, selectedArea, selectedDi
   background: var(--surface-primary);
   color: var(--foreground-primary);
   padding: 0 var(--space-3);
+}
+
+.field-error {
+  color: #b42318;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .contact-form textarea {

@@ -1,3 +1,5 @@
+import type { ClientDetailsDto, ClientSummaryDto } from './ApiDto'
+
 export interface IntakeOption {
   id: string
   title: string
@@ -20,20 +22,6 @@ export interface FormResponse {
   id: number
 }
 
-export interface ClientSummary extends FormClient {
-  id: number
-}
-
-export interface ClientForm {
-  payload: Record<string, string>
-  created_at: string
-  updated_at: string
-}
-
-export interface ClientDetails extends ClientSummary {
-  forms: ClientForm[]
-}
-
 export abstract class ApiService {
   abstract getAreas(): Promise<IntakeOption[]>
 
@@ -45,7 +33,7 @@ export abstract class ApiService {
 
   abstract createForm(request: FormRequest): Promise<FormResponse>
 
-  abstract getClients(): Promise<ClientSummary[]>
+  abstract getClients(): Promise<ClientSummaryDto[]>
 
-  abstract getClient(id: number): Promise<ClientDetails>
+  abstract getClient(id: number): Promise<ClientDetailsDto>
 }

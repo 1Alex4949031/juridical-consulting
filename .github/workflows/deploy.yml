@@ -36,6 +36,7 @@ jobs:
         env:
           VITE_API_MODE: ${{ vars.VITE_API_MODE || 'mock' }}
           VITE_BASE_API_URL: ${{ vars.VITE_BASE_API_URL }}
+          VITE_ENABLE_APPLICATIONS_PAGE: ${{ vars.VITE_ENABLE_APPLICATIONS_PAGE || 'true' }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
