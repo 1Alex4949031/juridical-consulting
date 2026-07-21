@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { ApplicationRecord } from '../models/Application'
 
 interface Props {
@@ -7,32 +6,6 @@ interface Props {
 }
 
 const { applications } = defineProps<Props>()
-
-const payloadLabels: Record<string, string> = {
-  mode: 'Тип заявки',
-  practice_id: 'Практика',
-  area_id: 'Область права',
-  direction_id: 'Направление',
-  situation_id: 'Ситуация',
-  expected_result_id: 'Ожидаемый результат',
-  custom_area: 'Своя область права',
-  custom_direction: 'Свое направление',
-  custom_situation: 'Своя ситуация',
-  custom_expected_result: 'Своя задача',
-  documents: 'Документы',
-  request_topic: 'Тема запроса',
-}
-
-const rows = computed(() =>
-  applications.map((application) => ({
-    ...application,
-    payloadItems: Object.entries(application.payload).map(([key, value]) => ({
-      key,
-      label: payloadLabels[key] ?? key,
-      value,
-    })),
-  })),
-)
 
 function formatDate(value: Date | null) {
   if (!value) {
@@ -53,7 +26,7 @@ function phoneHref(phone: string) {
 <template>
   <div class="applications-list" role="list">
     <article
-      v-for="application in rows"
+      v-for="application in applications"
       :key="application.id"
       class="application-row"
       role="listitem"
@@ -93,8 +66,8 @@ function phoneHref(phone: string) {
 
       <section class="payload-section" aria-label="Данные заявки">
         <h3>Данные заявки</h3>
-        <dl v-if="application.payloadItems.length" class="payload-data">
-          <div v-for="item in application.payloadItems" :key="item.key">
+        <dl v-if="application.details.length" class="payload-data">
+          <div v-for="item in application.details" :key="item.key">
             <dt>{{ item.label }}</dt>
             <dd>{{ item.value }}</dd>
           </div>

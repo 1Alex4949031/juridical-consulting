@@ -1,3 +1,9 @@
+export interface ApplicationDetail {
+  key: string
+  label: string
+  value: string
+}
+
 export interface ApplicationRecord {
   id: string
   clientId: number
@@ -5,6 +11,7 @@ export interface ApplicationRecord {
   phone: string
   email: string | null
   payload: Record<string, string>
+  details: ApplicationDetail[]
   createdAt: Date | null
   updatedAt: Date | null
 }

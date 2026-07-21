@@ -33,7 +33,14 @@ try {
     email: 'ivan@example.ru',
     forms: [
       {
-        payload: { request_topic: 'Проверка договора' },
+        payload: {
+          mode: 'detail',
+          area_id: 'private',
+          direction_id: 'family',
+          situation_id: 'division',
+          expected_result_id: 'strategy',
+          request_topic: 'Проверка договора',
+        },
         created_at: '2026-07-20T08:30:00.000Z',
         updated_at: '2026-07-20T09:30:00.000Z',
       },
@@ -43,6 +50,16 @@ try {
   assert.equal(mappedApplications.length, 1)
   assert.equal(mappedApplications[0].clientId, 5)
   assert.equal(mappedApplications[0].payload.request_topic, 'Проверка договора')
+  assert.deepEqual(
+    mappedApplications[0].details.slice(0, 5).map(({ label, value }) => [label, value]),
+    [
+      ['Тип заявки', 'Детальная заявка'],
+      ['Область права', 'Частное право'],
+      ['Направление', 'Семейное право'],
+      ['Ситуация', 'Раздел имущества'],
+      ['Ожидаемый результат', 'Правовая стратегия'],
+    ],
+  )
   assert.equal(mappedApplications[0].createdAt.toISOString(), '2026-07-20T08:30:00.000Z')
 
   const { ApplicationsModel } = await server.ssrLoadModule('/src/models/ApplicationsModel.ts')
@@ -112,6 +129,8 @@ try {
   await formModel.submit()
 
   assert.equal(submittedRequest.client.phone_number, '+79131234567')
+  assert.equal(submittedRequest.payload.mode_title, 'Быстрая заявка')
+  assert.equal(submittedRequest.payload.practice_title, 'Бизнес')
   assert.match(formModel.submitSuccess, /17/)
 
   console.log('Passed: phone, mapper, applications model, form submission')

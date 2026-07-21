@@ -25,10 +25,15 @@ const seededClients: StoredClient[] = [
       {
         payload: {
           mode: 'detail',
+          mode_title: 'Детальная заявка',
           area_id: 'private',
+          area_title: 'Частное право',
           direction_id: 'family',
+          direction_title: 'Семейное право',
           situation_id: 'division',
+          situation_title: 'Раздел имущества',
           expected_result_id: 'strategy',
+          expected_result_title: 'Правовая стратегия',
           documents: 'Есть',
           request_topic: 'Нужна оценка перспектив раздела совместного имущества.',
         },
@@ -46,7 +51,9 @@ const seededClients: StoredClient[] = [
       {
         payload: {
           mode: 'quick',
+          mode_title: 'Быстрая заявка',
           practice_id: 'business',
+          practice_title: 'Бизнес и договоры',
           documents: 'Нужно подготовить',
           request_topic: 'Проверка договора поставки перед подписанием.',
         },
@@ -56,7 +63,9 @@ const seededClients: StoredClient[] = [
       {
         payload: {
           mode: 'quick',
+          mode_title: 'Быстрая заявка',
           practice_id: 'court',
+          practice_title: 'Судебная защита',
           documents: 'Есть',
           request_topic: 'Контрагент не исполняет обязательства по оплате.',
         },

@@ -47,7 +47,7 @@ export class FormModel {
   submitSuccess = ''
 
   constructor(
-    services: LegalService[],
+    private readonly services: LegalService[],
     private readonly apiService: ApiService,
   ) {
     this.quickPracticeId = services[0]?.id ?? ''
@@ -71,6 +71,10 @@ export class FormModel {
 
   get selectedGoal() {
     return this.expectedResults.find((goal) => goal.id === this.goalId)
+  }
+
+  get selectedQuickPractice() {
+    return this.services.find((service) => service.id === this.quickPracticeId)
   }
 
   get phoneError() {
@@ -308,12 +312,18 @@ export class FormModel {
 
     const payload: Record<string, string> = {
       mode: this.mode,
+      mode_title: this.mode === 'quick' ? 'Быстрая заявка' : 'Детальная заявка',
       documents: this.documents,
       request_topic: this.situation.trim(),
     }
 
     if (this.mode === 'quick') {
       payload.practice_id = this.quickPracticeId
+      payload.practice_title = this.resolvePayloadTitle(
+        this.selectedQuickPractice,
+        this.customDirection,
+        this.quickPracticeId,
+      )
 
       if (this.customDirection.trim()) {
         payload.custom_direction = this.customDirection.trim()
@@ -323,6 +333,22 @@ export class FormModel {
       payload.direction_id = this.directionId
       payload.situation_id = this.situationId
       payload.expected_result_id = this.goalId
+      payload.area_title = this.resolvePayloadTitle(this.selectedArea, this.customArea, this.legalAreaId)
+      payload.direction_title = this.resolvePayloadTitle(
+        this.selectedDirection,
+        this.customDirection,
+        this.directionId,
+      )
+      payload.situation_title = this.resolvePayloadTitle(
+        this.selectedSituation,
+        this.customSituation,
+        this.situationId,
+      )
+      payload.expected_result_title = this.resolvePayloadTitle(
+        this.selectedGoal,
+        this.customGoal,
+        this.goalId,
+      )
 
       if (this.customArea.trim()) {
         payload.custom_area = this.customArea.trim()
@@ -349,6 +375,14 @@ export class FormModel {
       },
       payload,
     }
+  }
+
+  private resolvePayloadTitle(
+    option: { title: string } | undefined,
+    customValue: string,
+    fallback: string,
+  ) {
+    return customValue.trim() || option?.title.trim() || fallback
   }
 
   private async loadIntakeStep(step: Exclude<IntakeLoadingStep, null>, loader: () => Promise<void>) {
