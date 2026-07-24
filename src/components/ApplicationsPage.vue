@@ -9,11 +9,13 @@ const { model } = useApplicationsController()
 <template>
   <main class="applications-page">
     <header class="applications-topbar">
-      <a class="brand" href="./" aria-label="Линия Права — главная">
+      <RouterLink class="brand" :to="{ name: 'home' }" aria-label="Линия Права — главная">
         <span class="brand-mark"><img :src="logoUrl" alt="" /></span>
         <span>ЛИНИЯ ПРАВА</span>
-      </a>
-      <a class="back-link" href="./#contact">На основной сайт</a>
+      </RouterLink>
+      <RouterLink class="back-link" :to="{ name: 'home', hash: '#contact' }">
+        На основной сайт
+      </RouterLink>
     </header>
 
     <section class="applications-workspace" aria-labelledby="applications-title">

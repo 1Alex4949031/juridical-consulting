@@ -16,15 +16,15 @@ defineProps<{
     <div class="hero-inner">
       <div class="hero-copy">
         <nav class="nav" aria-label="Основная навигация">
-          <a class="brand" href="#" aria-label="Линия Права">
+          <RouterLink class="brand" :to="{ name: 'home' }" aria-label="Линия Права">
             <span class="brand-logo" aria-hidden="true">
               <img :src="logoUrl" alt="" width="36" height="36" />
             </span>
             <span>Линия Права</span>
-          </a>
-          <a href="#services">Практики</a>
-          <a href="#process">Процесс</a>
-          <a href="#contact">Контакты</a>
+          </RouterLink>
+          <RouterLink :to="{ name: 'home', hash: '#services' }">Практики</RouterLink>
+          <RouterLink :to="{ name: 'home', hash: '#process' }">Процесс</RouterLink>
+          <RouterLink :to="{ name: 'home', hash: '#contact' }">Контакты</RouterLink>
         </nav>
 
         <div class="hero-message">
@@ -34,8 +34,12 @@ defineProps<{
             Консультируем бизнес и частных клиентов в Новосибирске: фиксируем факты, риски и экономику решения, затем готовим документы, ведем переговоры или защищаем позицию в суде.
           </p>
           <div class="hero-actions">
-            <a class="primary-action" href="#contact">Запросить консультацию</a>
-            <a class="secondary-action" href="#services">Смотреть практики</a>
+            <RouterLink class="primary-action" :to="{ name: 'home', hash: '#contact' }">
+              Запросить консультацию
+            </RouterLink>
+            <RouterLink class="secondary-action" :to="{ name: 'home', hash: '#services' }">
+              Смотреть практики
+            </RouterLink>
           </div>
         </div>
       </div>

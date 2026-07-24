@@ -1,39 +1,72 @@
 # Линия Права
 
-Сайт юридических услуг на Vue 3, TypeScript и Vite.
+Сайт юридической клиники на Vue 3, TypeScript и Vite.
 
-Данные привелены в качестве примера
+## Требования
 
-## Запуск
+- Node.js 24
+- pnpm 11.9
+
+## Локальный запуск
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-## API
+Основная страница доступна по `/juridical-consulting/#/`, страница клиентов — по
+`/juridical-consulting/#/clients`. Старый адрес `#/applications` перенаправляется
+на `#/clients`.
 
-Настройки находятся в `.env`:
+## Архитектура
+
+Форма консультации разделена на три слоя:
+
+- `view` — Vue-компоненты без бизнес-правил;
+- `controller` — composable, который создает реактивную модель и связывает ее с жизненным циклом Vue;
+- `model` — поля, валидация, каскад юридических справочников и подготовка API-запроса.
+
+API подключается через абстрактный `ApiService`. Реализация выбирается в
+`createApiService` между `MockApiService` и `HttpApiService`.
+
+## Переменные окружения
 
 ```dotenv
 VITE_BASE_API_URL=/api
 VITE_API_MODE=mock
-VITE_ENABLE_APPLICATIONS_PAGE=true
+VITE_BASE_PATH=/juridical-consulting/
 ```
 
-`VITE_API_MODE=mock` использует локальные данные. Для подключения бекенда укажите его базовый URL и переключите режим:
+- `VITE_API_MODE=mock` использует локальные данные.
+- `VITE_API_MODE=api` отправляет запросы на `VITE_BASE_API_URL`.
+- `VITE_BASE_PATH` задает публичный путь Vite.
 
-```dotenv
-VITE_BASE_API_URL=https://example.ru/api
-VITE_API_MODE=api
-```
+Переменные Vite встраиваются во время сборки. После их изменения нужно
+перезапустить dev-сервер или пересобрать приложение.
 
-После изменения `.env` перезапустите dev-сервер. Для GitHub Pages добавьте одноименные Repository Variables в `Settings → Secrets and variables → Actions → Variables`. Укажите абсолютный HTTPS URL бекенда, доступный из браузера.
+Страница клиентов отображает персональные данные. Перед подключением реального
+API ее необходимо защитить серверной авторизацией.
 
-Временная страница заявок доступна по `#/applications` и по умолчанию включена, в том числе для GitHub Pages. Чтобы скрыть ее, установите `VITE_ENABLE_APPLICATIONS_PAGE=false`. Учтите, что API клиентов содержит персональные данные, а в текущем Swagger авторизация не описана.
-
-## Сборка
+## Проверки
 
 ```bash
-npm run build
+pnpm typecheck
+pnpm test
+pnpm build
 ```
+
+## Docker Compose
+
+```bash
+docker compose up --build
+```
+
+Сайт откроется по адресу `http://localhost:8080`. Порт можно изменить переменной
+`FRONTEND_PORT`, а публичный путь контейнерной сборки — переменной
+`COMPOSE_VITE_BASE_PATH`.
+
+## GitHub Pages
+
+Workflow `.github/workflows/deploy.yml` собирает приложение с
+`VITE_BASE_PATH=/juridical-consulting/` и публикует каталог `dist`.
+`VITE_API_MODE` и `VITE_BASE_API_URL` задаются через Repository Variables.
