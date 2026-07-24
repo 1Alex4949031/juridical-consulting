@@ -1,7 +1,12 @@
-import type { ClientDetailsDto, ClientFormDto } from '../api/ApiDto'
-import { legalIntakeAreas } from '../data/legalIntake'
-import { legalServices } from '../data/legalServices'
-import type { ApplicationDetail, ApplicationRecord } from '../models/Application'
+import type { ClientDetailsDto, ClientFormDto, ClientSummaryDto } from '../../../api/ApiDto'
+import { legalIntakeAreas } from '../../../data/legalIntake'
+import { legalServices } from '../../../data/legalServices'
+import type {
+  ClientDetails,
+  ClientListItem,
+  ClientRequest,
+  ClientRequestDetail,
+} from './Client'
 
 interface PayloadField {
   key: string
@@ -99,8 +104,8 @@ function parseDate(value: string | undefined): Date | null {
   return Number.isNaN(date.getTime()) ? null : date
 }
 
-function mapPayloadDetails(payload: Record<string, string>): ApplicationDetail[] {
-  const details: ApplicationDetail[] = []
+function mapPayloadDetails(payload: Record<string, string>): ClientRequestDetail[] {
+  const details: ClientRequestDetail[] = []
   const handledKeys = new Set<string>()
 
   for (const field of payloadFields) {
@@ -144,39 +149,57 @@ function mapPayloadDetails(payload: Record<string, string>): ApplicationDetail[]
   return details
 }
 
-export class ApplicationMapper {
-  static fromClient(client: ClientDetailsDto): ApplicationRecord[] {
-    if (!Number.isInteger(client.id) || Number(client.id) < 1) {
-      throw new Error('В ответе клиента отсутствует корректный идентификатор.')
-    }
-
-    const clientId = client.id as number
-
-    return (client.forms ?? []).map((form, index) =>
-      this.fromForm(clientId, client, form, index),
-    )
+function requireClientId(id: number | undefined): number {
+  if (!Number.isInteger(id) || Number(id) < 1) {
+    throw new Error('В ответе клиента отсутствует корректный идентификатор.')
   }
 
-  private static fromForm(
-    clientId: number,
-    client: ClientDetailsDto,
-    form: ClientFormDto,
-    index: number,
-  ): ApplicationRecord {
-    const createdAt = parseDate(form.created_at)
-    const updatedAt = parseDate(form.updated_at)
-    const payload = { ...(form.payload ?? {}) }
+  return id as number
+}
+
+function mapClientBase(client: ClientSummaryDto): ClientListItem {
+  return {
+    id: requireClientId(client.id),
+    fullName: client.full_name?.trim() || 'Без имени',
+    phone: client.phone_number?.trim() || null,
+    email: client.email?.trim() || null,
+  }
+}
+
+function mapRequest(clientId: number, form: ClientFormDto, index: number): ClientRequest {
+  const createdAt = parseDate(form.created_at)
+  const updatedAt = parseDate(form.updated_at)
+  const payload = { ...(form.payload ?? {}) }
+
+  return {
+    id: `${clientId}-${form.created_at ?? 'unknown'}-${index}`,
+    details: mapPayloadDetails(payload),
+    createdAt,
+    updatedAt,
+  }
+}
+
+export class ClientMapper {
+  static fromSummary(client: ClientSummaryDto): ClientListItem {
+    return mapClientBase(client)
+  }
+
+  static fromSummaryList(clients: ClientSummaryDto[]): ClientListItem[] {
+    return clients.map((client) => this.fromSummary(client))
+  }
+
+  static fromDetails(client: ClientDetailsDto): ClientDetails {
+    const base = mapClientBase(client)
+    const requests = (client.forms ?? [])
+      .map((form, index) => mapRequest(base.id, form, index))
+      .sort(
+        (left, right) =>
+          (right.createdAt?.getTime() ?? 0) - (left.createdAt?.getTime() ?? 0),
+      )
 
     return {
-      id: `${clientId}-${form.created_at ?? 'unknown'}-${index}`,
-      clientId,
-      fullName: client.full_name?.trim() || 'Без имени',
-      phone: client.phone_number?.trim() || 'Не указан',
-      email: client.email?.trim() || null,
-      payload,
-      details: mapPayloadDetails(payload),
-      createdAt,
-      updatedAt,
+      ...base,
+      requests,
     }
   }
 }

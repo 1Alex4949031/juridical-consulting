@@ -15,16 +15,44 @@ export const router = createRouter({
     },
     {
       path: '/clients',
-      name: 'clients',
-      component: () => import('../views/ClientsView.vue'),
+      component: () => import('../views/ClientsLayoutView.vue'),
       meta: {
-        title: 'Заявки клиентов | Линия Права',
         robots: 'noindex, nofollow',
       },
+      children: [
+        {
+          path: '',
+          name: 'clients',
+          component: () => import('../views/ClientsView.vue'),
+          meta: {
+            title: 'Клиенты | Линия Права',
+            robots: 'noindex, nofollow',
+          },
+        },
+        {
+          path: ':clientId(\\d+)',
+          name: 'client-details',
+          component: () => import('../views/ClientDetailsView.vue'),
+          props: (route) => ({
+            clientId: Number(route.params.clientId),
+          }),
+          meta: {
+            title: 'Карточка клиента | Линия Права',
+            robots: 'noindex, nofollow',
+          },
+        },
+      ],
     },
     {
       path: '/applications',
       redirect: { name: 'clients' },
+    },
+    {
+      path: '/applications/:clientId(\\d+)',
+      redirect: (route) => ({
+        name: 'client-details',
+        params: { clientId: route.params.clientId },
+      }),
     },
     {
       path: '/:pathMatch(.*)*',

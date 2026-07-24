@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import ApplicationsPage from '../components/ApplicationsPage.vue'
+import { useClientsListController } from '../features/clients/controller/useClientsListController'
+import ClientsListView from '../features/clients/view/ClientsListView.vue'
+
+const { model, reload } = useClientsListController()
 </script>
 
 <template>
-  <ApplicationsPage />
+  <ClientsListView
+    :clients="model.clients"
+    :total-clients="model.totalClients"
+    :is-loading="model.isLoading"
+    :error="model.error"
+    @reload="reload"
+  />
 </template>

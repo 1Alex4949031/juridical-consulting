@@ -14,9 +14,10 @@ pnpm install
 pnpm dev
 ```
 
-Основная страница доступна по `/juridical-consulting/#/`, страница клиентов — по
-`/juridical-consulting/#/clients`. Старый адрес `#/applications` перенаправляется
-на `#/clients`.
+Основная страница доступна по `/juridical-consulting/#/`, список клиентов — по
+`/juridical-consulting/#/clients`, профиль клиента — по
+`/juridical-consulting/#/clients/:clientId`. Старый адрес `#/applications`
+перенаправляется на `#/clients`.
 
 ## Архитектура
 
@@ -28,6 +29,13 @@ pnpm dev
 
 API подключается через абстрактный `ApiService`. Реализация выбирается в
 `createApiService` между `MockApiService` и `HttpApiService`.
+
+Раздел клиентов также следует VMC:
+
+- `ClientsListModel` загружает краткий список клиентов;
+- `ClientDetailsModel` загружает профиль и заявки выбранного клиента;
+- `ClientMapper` преобразует API DTO в русскоязычную доменную модель;
+- route-view связывают composable-контроллеры с компонентами списка и профиля.
 
 ## Переменные окружения
 
